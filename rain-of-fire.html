@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Rain Of Fire: War Defense</title>
+
+    <!-- TODO: replace with your real production domain -->
+    <meta property="og:title" content="Rain Of Fire: War Defense" />
+    <meta property="og:description" content="Build, defend, and battle with players online." />
+    <meta property="og:image" content="https://play.yourdomain.com/images/Icon-Store-1024.png" />
+    <meta property="og:url" content="https://play.yourdomain.com/rain-of-fire.html" />
+    <meta property="og:type" content="website" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/png" href="images/Icon-Store-1024.png">
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-family: 'DM Sans', sans-serif;
+            background-color: #F4F1DE;
+            color: #3D405B;
+        }
+
+        .download-card {
+            padding: 40px 30px;
+        }
+
+        .download-card img {
+            width: 120px;
+            height: 120px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .download-card h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+        }
+
+        .download-card a {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 30px;
+            border-radius: 100px;
+            background-color: #81B29A;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: 700;
+            transition: background-color 0.3s;
+        }
+
+        .download-card a:hover {
+            background-color: #E07A5F;
+        }
+    </style>
+</head>
+<body>
+    <div class="download-card">
+        <img src="images/Icon-Store-1024.png" alt="Rain Of Fire: War Defense">
+
+        <h1>Redirecting...</h1>
+    </div>
+
+    <script>
+        const ua = navigator.userAgent || navigator.vendor;
+
+        // TODO: replace with your real Google Play / App Store links
+        const androidUrl = "https://play.google.com/store/apps/details?id=com.company.game";
+        const iosUrl = "https://apps.apple.com/app/id123456789";
+
+        if (/android/i.test(ua)) {
+            window.location.href = androidUrl;
+        } else if (/iPad|iPhone|iPod/.test(ua)) {
+            window.location.href = iosUrl;
+        } else {
+            document.querySelector('.download-card').innerHTML = `
+                <img src="images/Icon-Store-1024.png" alt="Rain Of Fire: War Defense">
+                <h1>Download Game</h1>
+                <a href="${androidUrl}">Android</a>
+                <a href="${iosUrl}">iOS</a>
+            `;
+        }
+    </script>
+</body>
+</html>
