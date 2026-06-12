@@ -1097,6 +1097,11 @@ strong {
   margin-right: auto;
 }
 
+.site-footer-legal p {
+  color: var(--p-color);
+  opacity: 0.9;
+}
+
 
 /*---------------------------------------
   CUSTOM FORM               
