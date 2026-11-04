@@ -80,6 +80,7 @@ const footer = (lang, pagePath) => {
         <li><a href="${gameHome(lang)}" rel="noopener">${esc(game.shortName)}</a></li>
         <li><a href="${company.tiktok}" rel="me noopener">TikTok @rainoffire.co</a></li>
         <li><a href="${company.facebook}" rel="me noopener">Facebook</a></li>
+        <li><a href="${company.reddit}" rel="me noopener">Reddit r/rainoffire</a></li>
         <li><a href="mailto:${company.email}">${esc(company.email)}</a></li>
       </ul>
     </div>
@@ -132,7 +133,7 @@ const orgNode = (lang) => ({
   address: { '@type': 'PostalAddress', addressLocality: company.city, addressCountry: company.country },
   founder: [{ '@type': 'Person', name: company.founder, jobTitle: 'Founder' }, { '@type': 'Person', name: company.coFounder, jobTitle: 'Co-Founder' }],
   contactPoint: [{ '@type': 'ContactPoint', contactType: 'customer support', email: company.email, telephone: company.phoneTel, availableLanguage: ['English', 'Vietnamese'] }],
-  sameAs: [company.facebook, company.tiktok, game.androidUrl, game.iosUrl, `${GAME_URL}/`],
+  sameAs: [company.facebook, company.tiktok, company.reddit, game.androidUrl, game.iosUrl, `${GAME_URL}/`],
 });
 const gameNode = () => ({
   '@type': 'VideoGame', '@id': `${GAME_URL}/#game`, name: game.name, url: `${GAME_URL}/`, image: `${SITE_URL}/img/rain-of-fire-icon-512.png`,
@@ -209,7 +210,7 @@ const contactList = (lang, withSocial = true) => {
     ['phone', c.contact.items.phone, `<a href="tel:${company.phoneTel}">${esc(company.phoneDisplay)}</a>`],
     ['pin', c.contact.items.address, esc(c.contact.addressValue)],
   ];
-  if (withSocial) items.push(['globe', c.contact.items.social, `<a href="${company.facebook}" rel="me noopener">Facebook</a> · <a href="${company.tiktok}" rel="me noopener">TikTok</a>`]);
+  if (withSocial) items.push(['globe', c.contact.items.social, `<a href="${company.facebook}" rel="me noopener">Facebook</a> · <a href="${company.tiktok}" rel="me noopener">TikTok</a> · <a href="${company.reddit}" rel="me noopener">Reddit</a>`]);
   return `<ul class="contact">${items.map(([i, k, v]) => `<li>${icons[i]}<div><span>${esc(k)}</span>${v}</div></li>`).join('')}</ul>`;
 };
 

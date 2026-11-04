@@ -18,8 +18,9 @@ export const company = {
   country: 'VN',
   founder: 'Nguyen Thanh Duy',
   coFounder: 'Sandy',
-  facebook: 'https://www.facebook.com/share/1GAVYiUypz/?mibextid=wwXIfr',
+  facebook: 'https://www.facebook.com/profile.php?id=61590556208270',
   tiktok: 'https://www.tiktok.com/@rainoffire.co',
+  reddit: 'https://www.reddit.com/r/rainoffire/',
 };
 
 export const game = {
