@@ -1,7 +1,9 @@
 {
-  "name": "thanhdanh-site",
+  "name": "rainoffire-site",
   "compatibility_date": "2026-06-12",
   "assets": {
-    "directory": "./"
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
   }
 }
