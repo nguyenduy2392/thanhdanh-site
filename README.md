@@ -1,46 +1,28 @@
-# Site riêng của game: Rain Of Fire: War Defense
+# thanhdanh.pro.vn — web công ty Thanh Danh Soft
 
-Site tĩnh song ngữ (English `/`, Tiếng Việt `/vi/`) chỉ dành cho game, để SEO cho chính game. Web công ty nằm ở repo riêng `thanhdanh-site` (nhánh `redesign-seo`), có thẻ sản phẩm trỏ sang đây. **Chưa deploy.**
+Site tĩnh song ngữ (English `/`, Tiếng Việt `/vi/`): trang chủ, `/about/`, `/games/`, `/contact/` + `404.html`. Site game nằm ở repo riêng `rainoffire-site` (subdomain `rainoffire.thanhdanh.pro.vn`).
 
-## Trang
-
-`/` (trang game), `/how-to-play/`, `/game-modes/`, `/defense-guide/`, `/faq/` (mỗi trang có bản `/vi/...`) + `404.html`.
-Build tự sinh: canonical, hreflang (kèm x-default), Open Graph, JSON-LD (VideoGame, WebSite, WebPage/Article, FAQPage, BreadcrumbList, Organization), `sitemap.xml`, `robots.txt` (kèm Content-Signal), `llms.txt`, `_headers`.
-Organization dùng cùng `@id` (`https://thanhdanh.pro.vn/#organization`) với web công ty để search engine nối hai site thành một thực thể.
-
-## Cấu trúc
-
-```
-site/
-  build.mjs              # node build.mjs -> dist/ (không phụ thuộc gói ngoài)
-  src/config.mjs         # SITE_URL, COMPANY_URL, link store, ngôn ngữ
-  src/content/en.mjs     # nội dung tiếng Anh;  vi.mjs: tiếng Việt (cùng cấu trúc)
-  src/art.mjs            # hình SVG nội tuyến
-  src/assets/            # css, ảnh (img/screens/ = ảnh chụp game)
-  tools/make_assets.py   # sinh icon/favicon/ảnh OG từ tools/source/ (cần Pillow)
-  tools/qa.py            # kiểm tra SEO kỹ thuật trên dist/ (stdlib)
-  wrangler.jsonc         # Cloudflare Workers static assets, thư mục ./dist
-```
+Build tự sinh: canonical, hreflang (kèm x-default), Open Graph, JSON-LD (Organization, WebSite, WebPage/AboutPage/CollectionPage/ContactPage, FAQPage, VideoGame, BreadcrumbList), `sitemap.xml`, `robots.txt`, `llms.txt`, `_headers`, và `app-ads.txt` ở gốc domain (nguồn: `src/app-ads.txt`, nội dung giữ nguyên bản cũ).
+`@id` của Organization (`https://thanhdanh.pro.vn/#organization`) trùng với site game để search engine nối hai site thành một thực thể.
 
 ## Dùng
 
 ```bash
-cd site
-npm run build && python3 tools/qa.py     # phải in "QA: không có vấn đề."
-npm run preview                          # http://localhost:8099
-SITE_URL=https://example.com COMPANY_URL=https://company.example node build.mjs
-npm install && npm run deploy            # wrangler deploy (worker tên "rainoffire-site")
+npm run qa          # build + kiểm tra SEO kỹ thuật, phải in "QA: không có vấn đề."
+npm run preview     # http://localhost:8098
+npm run assets      # sinh lại favicon, logo sáng, ảnh OG (cần Pillow)
+npm install && npm run deploy   # wrangler deploy (worker "thanhdanh-site")
 ```
 
-## Trước khi deploy
+Nội dung sửa ở `src/content/en.mjs` và `vi.mjs` (cùng cấu trúc); thông tin công ty ở `src/config.mjs`.
 
-1. **Domain**: mặc định `https://rainoffire.thanhdanh.pro.vn` (subdomain của domain công ty, không cần mua mới). Dùng domain khác thì đặt `SITE_URL`, và đặt cùng giá trị `GAME_URL` cho `thanhdanh-site`.
-2. Thêm domain/subdomain trong Cloudflare cho worker `rainoffire-site`.
-3. Sau deploy: nộp `sitemap.xml` vào Google Search Console và Bing Webmaster Tools. Trong listing Google Play/App Store, đặt "website" của nhà phát triển trỏ về web công ty (nơi có `app-ads.txt`), và liên kết tới site game ở phần mô tả.
+## Trước / sau khi deploy
 
-## Việc nội dung còn thiếu (không bịa)
+1. Deploy site mới sẽ thay thế bản template cũ (nhánh `main`). Giữ nguyên `app-ads.txt` đã có trong `dist/`.
+2. Nộp `sitemap.xml` vào Google Search Console và Bing Webmaster Tools; đặt website nhà phát triển trên Google Play/App Store trỏ về `https://thanhdanh.pro.vn`.
 
-- Ảnh chụp màn hình thật: bỏ ảnh 16:9 (rộng 960 trở lên) vào `src/assets/img/screens/`, build tự thêm mục "Screenshots".
-- Trang chính sách riêng tư: store bắt buộc, chưa có. Cần người có chuyên môn duyệt trước khi đăng.
-- Đánh giá sao, lượt tải: chưa có số liệu nên không có `aggregateRating`.
-- Tên game không nhất quán (Android "Rain Of Fire", iOS "Iron Dome vs ICBM War"): nên thống nhất trên store.
+## Chưa có (không bịa)
+
+- Form liên hệ: cần backend, hiện dùng email/điện thoại.
+- Trang chính sách riêng tư, điều khoản: store thường yêu cầu, cần người có chuyên môn duyệt trước khi đăng.
+- Giờ làm việc, địa chỉ chi tiết, ảnh đội ngũ: chưa có dữ liệu thật.

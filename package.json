@@ -1,13 +1,14 @@
 {
-  "name": "rainoffire-site",
+  "name": "thanhdanh-site",
   "private": true,
   "version": "2.0.0",
-  "description": "Thanh Danh Soft company site + Rain Of Fire: War Defense product pages (static, EN/VI)",
+  "description": "Thanh Danh Soft company site (thanhdanh.pro.vn), static, EN/VI",
   "type": "module",
   "scripts": {
     "build": "node build.mjs",
     "assets": "python3 tools/make_assets.py",
-    "preview": "node build.mjs && python3 -m http.server 8099 --directory dist",
+    "qa": "node build.mjs && python3 tools/qa.py",
+    "preview": "node build.mjs && python3 -m http.server 8098 --directory dist",
     "dev": "node build.mjs && wrangler dev",
     "deploy": "node build.mjs && wrangler deploy"
   },

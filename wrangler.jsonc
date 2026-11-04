@@ -1,5 +1,5 @@
 {
-  "name": "rainoffire-site",
+  "name": "thanhdanh-site",
   "compatibility_date": "2026-06-12",
   "build": {
     "command": "npm run build"
