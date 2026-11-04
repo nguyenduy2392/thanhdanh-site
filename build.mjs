@@ -1,11 +1,11 @@
-// Site riêng của game Rain Of Fire. Build: node build.mjs  ->  dist/
-// Không có phụ thuộc ngoài Node. Sinh: HTML (EN + VI), sitemap.xml (hreflang), robots.txt, llms.txt, _headers, CSS có hash.
-import { mkdirSync, writeFileSync, readFileSync, cpSync, rmSync, existsSync, readdirSync } from 'node:fs';
+// Web công ty Thanh Danh Soft. Build: node build.mjs  ->  dist/
+// Không có phụ thuộc ngoài Node. Sinh: HTML (EN + VI), sitemap.xml (hreflang), robots.txt, llms.txt, _headers, app-ads.txt, CSS có hash.
+import { mkdirSync, writeFileSync, readFileSync, cpSync, rmSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { SITE_URL, COMPANY_URL, BUILD_DATE, company, game, languages, defaultLang, urlFor, absUrl } from './src/config.mjs';
-import { heroArt, icons, storeBadges } from './src/art.mjs';
+import { SITE_URL, GAME_URL, BUILD_DATE, company, game, languages, defaultLang, urlFor, absUrl, gameHome } from './src/config.mjs';
+import { icons, storeBadges } from './src/art.mjs';
 import en from './src/content/en.mjs';
 import vi from './src/content/vi.mjs';
 
@@ -17,14 +17,14 @@ const content = { en, vi };
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 const json = (o) => JSON.stringify(o).replace(/</g, '\\u003c');
 
-// ── Trang: trang chủ = trang game; các bài hướng dẫn nằm ngay dưới gốc ─────────────────────────
-const sections = ['how-to-play', 'game-modes', 'defense-guide', 'faq'];
 const pages = [
-  { key: 'game', path: '', kind: 'game' },
-  ...sections.map((k) => ({ key: k, path: k, kind: 'article' })),
+  { key: 'home', path: '' },
+  { key: 'about', path: 'about' },
+  { key: 'games', path: 'games' },
+  { key: 'contact', path: 'contact' },
 ];
-const pathOf = (key) => (key === 'game' ? '' : key);
-const companyHome = (lang) => `${COMPANY_URL}/${lang === defaultLang ? '' : `${lang}/`}`;
+const navKeys = pages.map((p) => p.key);
+const pathOf = (key) => pages.find((p) => p.key === key).path;
 
 // ── Tài nguyên tĩnh ─────────────────────────────────────────────────────────────────────────────
 rmSync(DIST, { recursive: true, force: true });
@@ -37,35 +37,24 @@ cpSync(join(SRC, 'assets/img'), join(DIST, 'img'), { recursive: true });
 for (const f of ['favicon.ico', 'favicon-32.png', 'apple-touch-icon.png']) {
   if (existsSync(join(SRC, 'assets', f))) cpSync(join(SRC, 'assets', f), join(DIST, f));
 }
-const screenshots = existsSync(join(SRC, 'assets/img/screens'))
-  ? readdirSync(join(SRC, 'assets/img/screens')).filter((f) => /\.(jpe?g|png|webp)$/i.test(f)).sort()
-  : [];
+// app-ads.txt phải nằm ở gốc domain nhà phát triển để các mạng quảng cáo xác thực
+cpSync(join(SRC, 'app-ads.txt'), join(DIST, 'app-ads.txt'));
 
 // ── Thành phần giao diện ────────────────────────────────────────────────────────────────────────
-const storeButtons = (c, extra = '') => `
-<div class="store-buttons ${extra}">
-  <a class="btn btn-store" href="${game.androidUrl}" rel="noopener" data-store="google-play">${storeBadges.android}<span><small>${esc(c.ui.storeSmall.android)}</small><b>Google Play</b></span></a>
-  <a class="btn btn-store" href="${game.iosUrl}" rel="noopener" data-store="app-store">${storeBadges.ios}<span><small>${esc(c.ui.storeSmall.ios)}</small><b>App Store</b></span></a>
-</div>`;
-
 const langSwitch = (lang, pagePath) =>
   `<nav class="lang" aria-label="${esc(content[lang].ui.language)}">` +
   languages.map((l) => (l.code === lang
     ? `<span aria-current="true">${l.short}</span>`
     : `<a href="${urlFor(l.code, pagePath)}" hreflang="${l.hreflang}" lang="${l.code}" title="${esc(l.label)}">${l.short}</a>`)).join('') + '</nav>';
 
-const navKeys = ['game', ...sections];
-const navLabel = (c, k) => c.ui.gameNav[k === 'game' ? 'overview' : k];
-
 const header = (lang, pagePath, activeKey) => {
   const c = content[lang];
   return `
 <header class="site-header">
   <div class="wrap bar">
-    <a class="brand" href="${urlFor(lang)}"><img src="/img/rain-of-fire-icon-64.png" width="36" height="36" alt="" decoding="async"><span>${esc(game.shortName)}</span></a>
+    <a class="brand" href="${urlFor(lang)}"><img src="/img/logo-light-96.png" width="36" height="36" alt="" decoding="async"><span>${esc(company.name)}</span></a>
     <nav class="primary" aria-label="Main">
-      ${navKeys.map((k) => `<a href="${urlFor(lang, pathOf(k))}"${k === activeKey ? ' aria-current="page"' : ''}>${esc(navLabel(c, k))}</a>`).join('')}
-      <a href="${companyHome(lang)}" rel="noopener">${esc(company.name)}</a>
+      ${navKeys.map((k) => `<a href="${urlFor(lang, pathOf(k))}"${k === activeKey ? ' aria-current="page"' : ''}>${esc(c.ui.nav[k])}</a>`).join('')}
     </nav>
     ${langSwitch(lang, pagePath)}
   </div>
@@ -78,90 +67,89 @@ const footer = (lang, pagePath) => {
 <footer class="site-footer">
   <div class="wrap foot">
     <div>
-      <p class="foot-brand"><img src="/img/rain-of-fire-icon-64.png" width="28" height="28" alt="" loading="lazy"> ${esc(game.name)}</p>
-      <p class="muted">${esc(c.ui.developedBy)} <a href="${companyHome(lang)}" rel="noopener">${esc(company.name)}</a><br>${esc(company.legalName)}<br>${esc(c.ui.taxCode)}: ${company.taxCode} · D-U-N-S: ${company.duns}<br>${esc(c.ui.address)}</p>
+      <p class="foot-brand"><img src="/img/logo-light-96.png" width="28" height="28" alt="" loading="lazy"> ${esc(company.name)}</p>
+      <p class="muted">${esc(company.legalName)}<br>${esc(c.ui.taxCode)}: ${company.taxCode} · D-U-N-S: ${company.duns}<br>${esc(c.ui.address)}</p>
     </div>
     <div>
-      <p class="foot-h">${esc(game.shortName)}</p>
-      <ul class="plain">${navKeys.map((k) => `<li><a href="${urlFor(lang, pathOf(k))}">${esc(navLabel(c, k))}</a></li>`).join('')}</ul>
+      <p class="foot-h">${esc(c.ui.companyInfo)}</p>
+      <ul class="plain">${navKeys.map((k) => `<li><a href="${urlFor(lang, pathOf(k))}">${esc(c.ui.nav[k])}</a></li>`).join('')}</ul>
     </div>
     <div>
       <p class="foot-h">${esc(c.ui.followUs)}</p>
       <ul class="plain">
+        <li><a href="${gameHome(lang)}" rel="noopener">${esc(game.shortName)}</a></li>
         <li><a href="${company.tiktok}" rel="me noopener">TikTok @rainoffire.co</a></li>
         <li><a href="${company.facebook}" rel="me noopener">Facebook</a></li>
-        <li><a href="${companyHome(lang)}" rel="noopener">${esc(c.ui.developerSite)}</a></li>
         <li><a href="mailto:${company.email}">${esc(company.email)}</a></li>
       </ul>
     </div>
   </div>
-  <div class="wrap legal"><span>© ${BUILD_DATE.slice(0, 4)} ${esc(company.name)}. ${esc(c.ui.copyright)}</span>${langSwitch(lang, pagePath)}</div>
+  <div class="wrap legal"><span>© ${BUILD_DATE.slice(0, 4)} ${esc(company.name)}. ${esc(c.ui.legal)}</span>${langSwitch(lang, pagePath)}</div>
 </footer>`;
-};
-
-const ctaBlock = (c) => `
-<section class="cta-band" aria-labelledby="cta-h">
-  <h2 id="cta-h">${esc(game.name)}</h2>
-  <p>${esc(c.ui.free)} · Android · iOS</p>
-  ${storeButtons(c, 'center')}
-</section>`;
-
-const renderBlocks = (c, blocks) => blocks.map((b) => {
-  switch (b.t) {
-    case 'h2': return `<h2 id="${b.id}">${esc(b.text)}</h2>`;
-    case 'p': return `<p>${b.html}</p>`;
-    case 'ul': return `<ul>${b.items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
-    case 'ol': return `<ol>${b.items.map((i) => `<li>${i}</li>`).join('')}</ol>`;
-    case 'table': return `<div class="table-wrap"><table><thead><tr>${b.head.map((h) => `<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${b.rows.map((r) => `<tr>${r.map((cell, i) => (i === 0 ? `<th scope="row">${esc(cell)}</th>` : `<td>${esc(cell)}</td>`)).join('')}</tr>`).join('')}</tbody></table></div>`;
-    case 'faq': return b.items.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('');
-    case 'cta': return ctaBlock(c);
-    default: throw new Error(`block lạ: ${b.t}`);
-  }
-}).join('\n');
-
-const relatedLinks = (lang, keys) => {
-  const c = content[lang];
-  return `<nav class="related" aria-labelledby="rel-h"><h2 id="rel-h">${esc(c.ui.related)}</h2><ul class="cards-links">${keys.map((k) => `<li><a href="${urlFor(lang, pathOf(k))}"><b>${esc(content[lang][k].h1)}</b><span>${esc(content[lang][k].description)}</span></a></li>`).join('')}</ul></nav>`;
 };
 
 const breadcrumb = (lang, trail) => `<nav class="crumbs" aria-label="${esc(content[lang].ui.breadcrumbs)}"><ol>${trail.map((t, i) => `<li>${i < trail.length - 1 ? `<a href="${t.href}">${esc(t.name)}</a>` : `<span aria-current="page">${esc(t.name)}</span>`}</li>`).join('')}</ol></nav>`;
 
+const renderBlocks = (lang, blocks) => blocks.map((b) => {
+  switch (b.t) {
+    case 'h2': return `<h2 id="${b.id}">${esc(b.text)}</h2>`;
+    case 'p': return `<p>${b.html.replaceAll('__GAME__', gameHome(lang))}</p>`;
+    case 'ul': return `<ul>${b.items.map((i) => `<li>${i}</li>`).join('')}</ul>`;
+    case 'table': return `<div class="table-wrap"><table><thead><tr>${b.head.map((h) => `<th scope="col">${esc(h)}</th>`).join('')}</tr></thead><tbody>${b.rows.map((r) => `<tr>${r.map((cell, i) => (i === 0 ? `<th scope="row">${esc(cell)}</th>` : `<td>${esc(cell)}</td>`)).join('')}</tr>`).join('')}</tbody></table></div>`;
+    default: throw new Error(`block lạ: ${b.t}`);
+  }
+}).join('\n');
+
+const storeButtons = (c) => `
+<div class="store-buttons">
+  <a class="btn btn-store" href="${game.androidUrl}" rel="noopener">${storeBadges.android}<span><small>${esc(c.ui.storeSmall.android)}</small><b>Google Play</b></span></a>
+  <a class="btn btn-store" href="${game.iosUrl}" rel="noopener">${storeBadges.ios}<span><small>${esc(c.ui.storeSmall.ios)}</small><b>App Store</b></span></a>
+</div>`;
+
+const gameCard = (lang, text, cta) => {
+  const c = content[lang];
+  return `
+<div class="product-card">
+  <img class="app-icon" src="/img/rain-of-fire-icon-256.png" width="128" height="128" alt="${esc(game.name)} app icon" loading="lazy" decoding="async">
+  <div>
+    <h3><a href="${gameHome(lang)}" rel="noopener">${esc(game.name)}</a></h3>
+    <p>${esc(text)}</p>
+    <p class="chips">${[c.ui.free, 'Android', 'iOS'].map((m) => `<span>${esc(m)}</span>`).join('')}</p>
+    <div class="actions"><a class="btn btn-primary" href="${gameHome(lang)}" rel="noopener">${esc(cta)}</a></div>
+  </div>
+</div>`;
+};
+
 // ── JSON-LD ─────────────────────────────────────────────────────────────────────────────────────
-// Organization dùng cùng @id với site công ty (thanhdanh-site) để search engine nối hai site thành một thực thể.
-const orgId = `${COMPANY_URL}/#organization`;
-const orgNode = () => ({
-  '@type': 'Organization', '@id': orgId, name: company.name, legalName: company.legalName, url: `${COMPANY_URL}/`,
+// @id của Organization trùng với site game (rainoffire-site) để search engine nối hai site thành một thực thể.
+const orgId = `${SITE_URL}/#organization`;
+const orgNode = (lang) => ({
+  '@type': 'Organization', '@id': orgId, name: company.name, legalName: company.legalName, url: `${SITE_URL}/`,
   logo: { '@type': 'ImageObject', url: `${SITE_URL}/img/logo-512.png`, width: 512, height: 512 },
-  sameAs: [`${COMPANY_URL}/`, company.tiktok, company.facebook],
+  description: content[lang].home.description,
+  foundingDate: company.foundingDate, taxID: company.taxCode, duns: company.duns,
+  email: company.email, telephone: company.phoneTel,
+  address: { '@type': 'PostalAddress', addressLocality: company.city, addressCountry: company.country },
+  founder: [{ '@type': 'Person', name: company.founder, jobTitle: 'Founder' }, { '@type': 'Person', name: company.coFounder, jobTitle: 'Co-Founder' }],
+  contactPoint: [{ '@type': 'ContactPoint', contactType: 'customer support', email: company.email, telephone: company.phoneTel, availableLanguage: ['English', 'Vietnamese'] }],
+  sameAs: [company.facebook, company.tiktok, game.androidUrl, game.iosUrl, `${GAME_URL}/`],
 });
-const gameId = `${SITE_URL}/#game`;
-const gameNode = (lang) => ({
-  '@type': 'VideoGame', '@id': gameId, name: game.name, alternateName: ['Rain Of Fire', 'Iron Dome vs ICBM War'],
-  description: content[lang].game.lead, url: `${SITE_URL}/`, image: `${SITE_URL}/img/rain-of-fire-icon-512.png`,
+const gameNode = () => ({
+  '@type': 'VideoGame', '@id': `${GAME_URL}/#game`, name: game.name, url: `${GAME_URL}/`, image: `${SITE_URL}/img/rain-of-fire-icon-512.png`,
   genre: ['Strategy', 'Tower defense', 'Multiplayer'], applicationCategory: 'GameApplication', gamePlatform: ['Android', 'iOS'],
-  operatingSystem: 'Android, iOS', inLanguage: game.languageCodes, playMode: ['SinglePlayer', 'MultiPlayer'],
-  publisher: { '@id': orgId }, author: { '@id': orgId },
-  installUrl: [game.androidUrl, game.iosUrl],
+  publisher: { '@id': orgId }, author: { '@id': orgId }, installUrl: [game.androidUrl, game.iosUrl],
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
 });
-
 const faqNode = (items) => ({ '@type': 'FAQPage', mainEntity: items.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) });
+const pageType = { home: 'WebPage', about: 'AboutPage', games: 'CollectionPage', contact: 'ContactPage' };
 
 const graph = (lang, page, trail) => {
-  const c = content[lang];
-  const url = absUrl(lang, page.path);
-  const pageData = c[page.key];
-  const nodes = [orgNode(),
-    { '@type': 'WebSite', '@id': `${SITE_URL}/#website`, url: `${SITE_URL}/`, name: game.name, publisher: { '@id': orgId }, inLanguage: languages.map((l) => l.hreflang) },
-    gameNode(lang)];
-  const base = { '@id': `${url}#webpage`, url, name: pageData.title, description: pageData.description, inLanguage: lang, isPartOf: { '@id': `${SITE_URL}/#website` }, datePublished: '2026-10-31', dateModified: BUILD_DATE, about: { '@id': gameId } };
-  if (page.kind === 'game') {
-    nodes.push({ '@type': 'WebPage', ...base }, faqNode(pageData.faq));
-  } else {
-    nodes.push({ '@type': 'Article', ...base, '@id': `${url}#article`, headline: pageData.h1, author: { '@id': orgId }, publisher: { '@id': orgId }, mainEntityOfPage: url });
-    const faqBlock = (pageData.blocks || []).find((b) => b.t === 'faq');
-    if (faqBlock) nodes.push(faqNode(faqBlock.items));
-  }
+  const c = content[lang], d = c[page.key], url = absUrl(lang, page.path);
+  const nodes = [orgNode(lang),
+    { '@type': 'WebSite', '@id': `${SITE_URL}/#website`, url: `${SITE_URL}/`, name: company.name, publisher: { '@id': orgId }, inLanguage: languages.map((l) => l.hreflang) },
+    { '@type': pageType[page.key], '@id': `${url}#webpage`, url, name: d.title, description: d.description, inLanguage: lang, isPartOf: { '@id': `${SITE_URL}/#website` }, about: { '@id': orgId }, dateModified: BUILD_DATE }];
+  if (page.key === 'home') { nodes.push(faqNode(d.faq), gameNode()); }
+  if (page.key === 'games') nodes.push(gameNode());
   if (trail.length > 1) nodes.push({ '@type': 'BreadcrumbList', itemListElement: trail.map((t, i) => ({ '@type': 'ListItem', position: i + 1, name: t.name, item: `${SITE_URL}${t.href}` })) });
   return { '@context': 'https://schema.org', '@graph': nodes };
 };
@@ -171,7 +159,6 @@ const head = ({ lang, page, title, description, ldGraph, noindex }) => {
   const url = absUrl(lang, page.path);
   const alts = languages.map((l) => `<link rel="alternate" hreflang="${l.hreflang}" href="${absUrl(l.code, page.path)}">`).join('\n')
     + `\n<link rel="alternate" hreflang="x-default" href="${absUrl(defaultLang, page.path)}">`;
-  const ogImg = `${SITE_URL}/img/og/game-${lang}.png`;
   const l = languages.find((x) => x.code === lang);
   return `<!doctype html>
 <html lang="${lang}">
@@ -184,21 +171,22 @@ const head = ({ lang, page, title, description, ldGraph, noindex }) => {
 ${noindex ? '<meta name="robots" content="noindex">' : '<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">'}
 ${noindex ? '' : alts}
 <meta name="theme-color" content="#0b1220">
-<meta property="og:type" content="${page.kind === 'article' ? 'article' : 'website'}">
-<meta property="og:site_name" content="${esc(game.name)}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="${esc(company.name)}">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${url}">
-<meta property="og:image" content="${ogImg}">
+<meta property="og:image" content="${SITE_URL}/img/og/company-${lang}.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="${esc(game.name)}">
+<meta property="og:image:alt" content="${esc(company.name)}">
 <meta property="og:locale" content="${l.locale}">
 ${languages.filter((x) => x.code !== lang).map((x) => `<meta property="og:locale:alternate" content="${x.locale}">`).join('\n')}
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preload" as="style" href="/css/site.${cssHash}.css">
 <link rel="stylesheet" href="/css/site.${cssHash}.css">
 ${ldGraph ? `<script type="application/ld+json">${json(ldGraph)}</script>` : ''}
 </head>`;
@@ -214,104 +202,139 @@ ${footer(lang, page.path)}
 </html>
 `;
 
-// ── Trang chủ = trang game ──────────────────────────────────────────────────────────────────────
-const renderGame = (lang) => {
-  const c = content[lang], g = c.game;
-  const page = pages[0];
-  const trail = [{ name: game.shortName, href: urlFor(lang) }];
-  const shots = screenshots.length
-    ? `<section class="section" aria-labelledby="shots-h"><div class="wrap"><h2 id="shots-h">${esc(c.ui.screenshots)}</h2><div class="shots">${screenshots.map((f, i) => `<img src="/img/screens/${f}" alt="${esc((c.ui.shotAlts || {})[f.replace(/\.[^.]+$/, '')] || `${game.name} screenshot ${i + 1}`)}" width="960" height="540" loading="lazy" decoding="async">`).join('')}</div></div></section>`
-    : '';
-  const body = `
-<main id="main">
-  <section class="hero hero-game">
-    <div class="wrap hero-grid">
-      <div class="hero-copy">
-        <img class="app-icon app-icon-sm" src="/img/rain-of-fire-icon-256.png" width="96" height="96" alt="${esc(game.name)} app icon" decoding="async">
-        <h1>${esc(g.h1)}</h1>
-        <p class="tagline">${esc(g.tagline)}</p>
-        <p class="lead">${esc(g.lead)}</p>
-        ${storeButtons(c)}
-        <p class="chips">${[c.ui.free, 'Android', 'iOS'].map((m) => `<span>${esc(m)}</span>`).join('')}</p>
-        <p class="byline">${esc(c.ui.developedBy)} <a href="${companyHome(lang)}" rel="noopener">${esc(company.name)}</a></p>
-      </div>
-      <div class="hero-visual">${heroArt}</div>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="facts-h">
-    <div class="wrap">
-      <h2 id="facts-h">${esc(g.factsTitle)}</h2>
-      <dl class="facts">${g.facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
-    </div>
-  </section>
-
-  ${shots}
-
-  <section class="section alt" aria-labelledby="feat-h">
-    <div class="wrap">
-      <h2 id="feat-h">${esc(g.featuresTitle)}</h2>
-      <ul class="features">${g.features.map((f) => `<li>${icons[f.icon]}<h3>${esc(f.title)}</h3><p>${esc(f.text)}</p></li>`).join('')}</ul>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="steps-h">
-    <div class="wrap narrow">
-      <h2 id="steps-h">${esc(g.stepsTitle)}</h2>
-      <ol class="steps">${g.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
-    </div>
-  </section>
-
-  <section class="section alt" aria-labelledby="modes-h">
-    <div class="wrap">
-      <h2 id="modes-h">${esc(g.modesTitle)}</h2>
-      <ul class="features three">${g.modes.map((m) => `<li>${icons[m.icon]}<h3>${esc(m.title)}</h3><p>${esc(m.text)}</p></li>`).join('')}</ul>
-      <p><a class="textlink" href="${urlFor(lang, 'game-modes')}">${esc(g.modesLink)} →</a></p>
-    </div>
-  </section>
-
-  <section class="section" aria-labelledby="lang-h">
-    <div class="wrap narrow">
-      <h2 id="lang-h">${esc(g.langTitle)}</h2>
-      <p>${esc(g.langText)}</p>
-      <ul class="chips big">${game.languages.map((l) => `<li>${esc(l)}</li>`).join('')}</ul>
-    </div>
-  </section>
-
-  <section class="section alt" aria-labelledby="faq-h">
-    <div class="wrap narrow">
-      <h2 id="faq-h">${esc(g.faqTitle)}</h2>
-      ${g.faq.map((f) => `<h3>${esc(f.q)}</h3><p>${esc(f.a)}</p>`).join('')}
-      <p><a class="textlink" href="${urlFor(lang, 'faq')}">${esc(g.faqLink)} →</a></p>
-    </div>
-  </section>
-
-  <div class="wrap">${ctaBlock(c)}</div>
-  <div class="wrap">${relatedLinks(lang, g.related)}</div>
-</main>`;
-  return shell({ lang, page, title: g.title, description: g.description, ldGraph: graph(lang, page, trail), body, activeKey: 'game' });
+const contactList = (lang, withSocial = true) => {
+  const c = content[lang];
+  const items = [
+    ['mail', c.contact.items.email, `<a href="mailto:${company.email}">${esc(company.email)}</a>`],
+    ['phone', c.contact.items.phone, `<a href="tel:${company.phoneTel}">${esc(company.phoneDisplay)}</a>`],
+    ['pin', c.contact.items.address, esc(c.contact.addressValue)],
+  ];
+  if (withSocial) items.push(['globe', c.contact.items.social, `<a href="${company.facebook}" rel="me noopener">Facebook</a> · <a href="${company.tiktok}" rel="me noopener">TikTok</a>`]);
+  return `<ul class="contact">${items.map(([i, k, v]) => `<li>${icons[i]}<div><span>${esc(k)}</span>${v}</div></li>`).join('')}</ul>`;
 };
 
-// ── Trang bài viết ──────────────────────────────────────────────────────────────────────────────
-const renderArticle = (lang, key) => {
-  const c = content[lang], a = c[key];
-  const page = pages.find((p) => p.key === key);
-  const trail = [{ name: game.shortName, href: urlFor(lang) }, { name: c.ui.gameNav[key], href: urlFor(lang, page.path) }];
-  const toc = a.blocks.filter((b) => b.t === 'h2');
+// ── Trang chủ ───────────────────────────────────────────────────────────────────────────────────
+const renderHome = (lang) => {
+  const c = content[lang], h = c.home, page = pages[0];
+  const f = c.ui.facts;
+  const facts = [[f.legalName, company.legalName], [f.taxCode, company.taxCode], [f.duns, company.duns], [f.founded, company.foundingDate], [f.location, c.ui.address], [f.founders, c.ui.foundersValue]];
+  const body = `
+<main id="main">
+  <section class="hero">
+    <div class="wrap narrow-hero">
+      <p class="eyebrow">${esc(h.eyebrow)}</p>
+      <h1>${esc(h.h1)}</h1>
+      <p class="lead">${esc(h.lead)}</p>
+      <div class="actions">
+        <a class="btn btn-primary" href="${gameHome(lang)}" rel="noopener">${esc(c.ui.playGame)}</a>
+        <a class="btn btn-ghost" href="${urlFor(lang, 'contact')}">${esc(c.ui.contactUs)}</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="what-h">
+    <div class="wrap">
+      <h2 id="what-h">${esc(h.whatTitle)}</h2>
+      <ul class="features three">${h.pillars.map((p) => `<li>${icons[p.icon]}<h3>${esc(p.title)}</h3><p>${esc(p.text)}</p></li>`).join('')}</ul>
+    </div>
+  </section>
+
+  <section class="section alt" aria-labelledby="game-h">
+    <div class="wrap">
+      <h2 id="game-h">${esc(h.gameTitle)}</h2>
+      ${gameCard(lang, h.gameLead, h.gameCta)}
+      ${storeButtons(c)}
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="upd-h">
+    <div class="wrap">
+      <h2 id="upd-h">${esc(h.updatesTitle)}</h2>
+      <ul class="features">${h.updates.map((u) => `<li>${icons.bolt}<h3>${esc(u.title)}</h3><p>${esc(u.text)}</p></li>`).join('')}</ul>
+    </div>
+  </section>
+
+  <section class="section alt" aria-labelledby="facts-h">
+    <div class="wrap">
+      <h2 id="facts-h">${esc(h.factsTitle)}</h2>
+      <dl class="facts">${facts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+      <p><a class="textlink" href="${urlFor(lang, 'about')}">${esc(c.ui.learnMore)} →</a></p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="faq-h">
+    <div class="wrap narrow">
+      <h2 id="faq-h">${esc(h.faqTitle)}</h2>
+      ${h.faq.map((q) => `<h3>${esc(q.q)}</h3><p>${esc(q.a)}</p>`).join('')}
+    </div>
+  </section>
+
+  <section class="section alt" aria-labelledby="contact-h">
+    <div class="wrap">
+      <h2 id="contact-h">${esc(h.contactTitle)}</h2>
+      <p class="section-lead">${esc(h.contactText)}</p>
+      ${contactList(lang, false)}
+    </div>
+  </section>
+</main>`;
+  return shell({ lang, page, title: h.title, description: h.description, ldGraph: graph(lang, page, [{ name: company.name, href: urlFor(lang) }]), body, activeKey: 'home' });
+};
+
+// ── Các trang con ───────────────────────────────────────────────────────────────────────────────
+const trailFor = (lang, key) => [{ name: company.name, href: urlFor(lang) }, { name: content[lang].ui.nav[key], href: urlFor(lang, pathOf(key)) }];
+const articleHead = (lang, key, d, trail) => `${breadcrumb(lang, trail)}
+    <h1>${esc(d.h1)}</h1>
+    <p class="lead">${esc(d.lead)}</p>`;
+
+const renderAbout = (lang) => {
+  const c = content[lang], d = c.about, page = pages[1], trail = trailFor(lang, 'about');
   const body = `
 <main id="main">
   <article class="article wrap narrow">
-    ${breadcrumb(lang, trail)}
-    <h1>${esc(a.h1)}</h1>
-    <p class="lead">${esc(a.lead)}</p>
-    <p class="meta">${esc(c.ui.updated)}: <time datetime="${BUILD_DATE}">${BUILD_DATE}</time></p>
-    ${toc.length > 2 ? `<nav class="toc" aria-label="On this page"><ul>${toc.map((b) => `<li><a href="#${b.id}">${esc(b.text)}</a></li>`).join('')}</ul></nav>` : ''}
-    ${renderBlocks(c, a.blocks)}
+    ${articleHead(lang, 'about', d, trail)}
+    ${renderBlocks(lang, d.blocks)}
+    <div class="actions"><a class="btn btn-primary" href="${urlFor(lang, 'contact')}">${esc(c.ui.contactUs)}</a></div>
   </article>
-  <div class="wrap">${relatedLinks(lang, a.related)}</div>
 </main>`;
-  return shell({ lang, page, title: a.title, description: a.description, ldGraph: graph(lang, page, trail), body, activeKey: key });
+  return shell({ lang, page, title: d.title, description: d.description, ldGraph: graph(lang, page, trail), body, activeKey: 'about' });
 };
+
+const renderGames = (lang) => {
+  const c = content[lang], d = c.games, page = pages[2], trail = trailFor(lang, 'games');
+  const body = `
+<main id="main">
+  <article class="article wrap narrow">
+    ${articleHead(lang, 'games', d, trail)}
+    <h2 id="rof">${esc(d.gameName)}</h2>
+    ${gameCard(lang, d.gameText, c.ui.playGame)}
+    <dl class="facts">${d.meta.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')}</dl>
+    <p class="muted">${esc(d.note)}</p>
+    ${storeButtons(c)}
+    <h2 id="guides">${esc(d.guidesTitle)}</h2>
+    <ul>${d.guides.map(([k, label]) => `<li><a href="${gameHome(lang)}${k}/" rel="noopener">${esc(label)}</a></li>`).join('')}</ul>
+  </article>
+</main>`;
+  return shell({ lang, page, title: d.title, description: d.description, ldGraph: graph(lang, page, trail), body, activeKey: 'games' });
+};
+
+const renderContact = (lang) => {
+  const c = content[lang], d = c.contact, page = pages[3], trail = trailFor(lang, 'contact');
+  const body = `
+<main id="main">
+  <article class="article wrap narrow">
+    ${articleHead(lang, 'contact', d, trail)}
+    ${contactList(lang)}
+    <p>${esc(d.support)}</p>
+    <div class="actions">
+      <a class="btn btn-primary" href="mailto:${company.email}">${esc(c.ui.emailUs)}</a>
+      <a class="btn btn-ghost" href="tel:${company.phoneTel}">${esc(c.ui.callUs)}</a>
+    </div>
+  </article>
+</main>`;
+  return shell({ lang, page, title: d.title, description: d.description, ldGraph: graph(lang, page, trail), body, activeKey: 'contact' });
+};
+
+const renderers = { home: renderHome, about: renderAbout, games: renderGames, contact: renderContact };
 
 // ── Ghi file ────────────────────────────────────────────────────────────────────────────────────
 const write = (rel, data) => {
@@ -320,16 +343,11 @@ const write = (rel, data) => {
   writeFileSync(file, data);
 };
 
-for (const l of languages) {
-  for (const p of pages) {
-    write(join(urlFor(l.code, p.path), 'index.html'), p.kind === 'game' ? renderGame(l.code) : renderArticle(l.code, p.key));
-  }
-}
+for (const l of languages) for (const p of pages) write(join(urlFor(l.code, p.path), 'index.html'), renderers[p.key](l.code));
 
 {
   const c = content.en;
-  const page = { key: '404', path: '', kind: 'game' };
-  write('404.html', shell({ lang: 'en', page, title: `${c.ui.notFoundTitle} | ${game.name}`, description: c.ui.notFoundText, noindex: true, activeKey: '404',
+  write('404.html', shell({ lang: 'en', page: { key: '404', path: '' }, title: `${c.ui.notFoundTitle} | ${company.name}`, description: c.ui.notFoundText, noindex: true, activeKey: '404',
     body: `<main id="main" class="wrap narrow notfound"><h1>${esc(c.ui.notFoundTitle)}</h1><p class="lead">${esc(c.ui.notFoundText)}</p><p><a class="btn btn-primary" href="/">${esc(c.ui.backHome)}</a></p></main>` }));
 }
 
@@ -346,28 +364,24 @@ for (const l of languages) {
 write('robots.txt', `User-agent: *\nContent-Signal: search=yes, ai-input=yes\nAllow: /\n\nSitemap: ${SITE_URL}/sitemap.xml\n`);
 
 {
-  const e = content.en;
-  const list = (lang) => navKeys.map((k) => {
-    const pg = content[lang][k];
-    return `- [${pg.h1}](${absUrl(lang, pathOf(k))}): ${pg.description}`;
-  }).join('\n');
-  write('llms.txt', `# ${game.name}
+  const list = (lang) => pages.map((p) => `- [${content[lang][p.key].h1 || company.name}](${absUrl(lang, p.path)}): ${content[lang][p.key].description}`).join('\n');
+  write('llms.txt', `# ${company.name}
 
-> ${e.game.description}
+> ${content.en.home.description}
 
-${game.name} is a free missile-defense strategy game for Android and iOS, made by ${company.name} (${company.legalName}), Hai Phong, Vietnam. Players build a city, defend it with radar, anti-air batteries and ABM interceptors, and attack with ICBMs. Modes: PvP online, PvE against bots, Play with Friends. 15 languages.
+${company.name} (${company.legalName}) is a mobile game studio founded in 2026 in Hai Phong, Vietnam by ${company.founder} and ${company.coFounder}. Its first game is ${game.name}, a free missile-defense strategy game for Android and iOS.
 
-## Guides
+## Pages
 ${list('en')}
 
 ## Tiếng Việt
 ${list('vi')}
 
-## Download and developer
+## Game and contact
+- Game site: ${GAME_URL}/
 - Google Play: ${game.androidUrl}
 - App Store: ${game.iosUrl}
-- Developer: [${company.name}](${COMPANY_URL}/)
-- Contact: ${company.email}
+- Contact: ${company.email}, ${company.phoneDisplay}
 `);
 }
 
@@ -382,6 +396,10 @@ write('_headers', `/*
 
 /img/*
   Cache-Control: public, max-age=2592000
+
+/app-ads.txt
+  Content-Type: text/plain; charset=utf-8
+  Cache-Control: public, max-age=3600
 `);
 
-console.log(`Built ${pages.length * languages.length} pages + 404 → ${DIST} (SITE_URL=${SITE_URL}, css=${cssHash}, screenshots=${screenshots.length})`);
+console.log(`Built ${pages.length * languages.length} pages + 404 → ${DIST} (SITE_URL=${SITE_URL}, css=${cssHash})`);
