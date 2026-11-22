@@ -83,7 +83,7 @@ export default {
     meta: [['Thể loại', 'Chiến thuật, phòng thủ tên lửa'], ['Nền tảng', 'Android, iOS'], ['Giá', 'Miễn phí'], ['Chế độ', 'PvP trực tuyến, PvE với bot, Chơi cùng bạn bè'], ['Ngôn ngữ', '15']],
     note: 'Trên App Store game có tên “Iron Dome vs ICBM War”.',
     guidesTitle: 'Hướng dẫn chơi',
-    guides: [['how-to-play', 'Cách chơi'], ['game-modes', 'Chế độ chơi'], ['defense-guide', 'Hướng dẫn phòng thủ'], ['faq', 'Hỏi đáp']],
+    guides: [['gift-codes', 'Gift Code'], ['tier-list', 'Bảng xếp hạng (Tier List)'], ['how-to-play', 'Cách chơi'], ['game-modes', 'Chế độ chơi'], ['defense-guide', 'Hướng dẫn phòng thủ'], ['faq', 'Hỏi đáp']],
   },
 
   contact: {

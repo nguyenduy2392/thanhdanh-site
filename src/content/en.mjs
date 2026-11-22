@@ -83,7 +83,7 @@ export default {
     meta: [['Genre', 'Strategy, missile defense'], ['Platforms', 'Android, iOS'], ['Price', 'Free to play'], ['Modes', 'PvP online, PvE bots, Play with Friends'], ['Languages', '15']],
     note: 'On the App Store the game is listed as “Iron Dome vs ICBM War”.',
     guidesTitle: 'Game guides',
-    guides: [['how-to-play', 'How to play'], ['game-modes', 'Game modes'], ['defense-guide', 'Defense guide'], ['faq', 'FAQ']],
+    guides: [['gift-codes', 'Gift Codes'], ['tier-list', 'Tier List'], ['how-to-play', 'How to play'], ['game-modes', 'Game modes'], ['defense-guide', 'Defense guide'], ['faq', 'FAQ']],
   },
 
   contact: {
