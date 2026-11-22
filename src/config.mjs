@@ -1,7 +1,7 @@
 // Web công ty Thanh Danh Soft (thanhdanh.pro.vn). Site game nằm ở repo rainoffire-site.
 // Đổi domain khi deploy:  SITE_URL=https://example.com GAME_URL=https://game.example.com node build.mjs
 export const SITE_URL = (process.env.SITE_URL || 'https://thanhdanh.pro.vn').replace(/\/$/, '');
-export const GAME_URL = (process.env.GAME_URL || 'https://rainoffire.thanhdanh.pro.vn').replace(/\/$/, '');
+export const GAME_URL = (process.env.GAME_URL || 'https://rain-of-fire.thanhdanh.pro.vn').replace(/\/$/, '');
 
 export const BUILD_DATE = process.env.BUILD_DATE || new Date().toISOString().slice(0, 10);
 

@@ -1,6 +1,6 @@
 # thanhdanh.pro.vn — web công ty Thanh Danh Soft
 
-Site tĩnh song ngữ (English `/`, Tiếng Việt `/vi/`): trang chủ, `/about/`, `/games/`, `/contact/` + `404.html`. Site game nằm ở repo riêng `rainoffire-site` (subdomain `rainoffire.thanhdanh.pro.vn`).
+Site tĩnh song ngữ (English `/`, Tiếng Việt `/vi/`): trang chủ, `/about/`, `/games/`, `/contact/` + `404.html`. Site game nằm ở repo riêng `rainoffire-site` (subdomain `rain-of-fire.thanhdanh.pro.vn`).
 
 Build tự sinh: canonical, hreflang (kèm x-default), Open Graph, JSON-LD (Organization, WebSite, WebPage/AboutPage/CollectionPage/ContactPage, FAQPage, VideoGame, BreadcrumbList), `sitemap.xml`, `robots.txt`, `llms.txt`, `_headers`, và `app-ads.txt` ở gốc domain (nguồn: `src/app-ads.txt`, nội dung giữ nguyên bản cũ).
 `@id` của Organization (`https://thanhdanh.pro.vn/#organization`) trùng với site game để search engine nối hai site thành một thực thể.
