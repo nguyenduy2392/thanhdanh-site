@@ -22,8 +22,9 @@ const pages = [
   { key: 'about', path: 'about' },
   { key: 'games', path: 'games' },
   { key: 'contact', path: 'contact' },
+  { key: 'privacy', path: 'privacy' },
 ];
-const navKeys = pages.map((p) => p.key);
+const navKeys = pages.filter((p) => p.key !== 'privacy').map((p) => p.key);
 const pathOf = (key) => pages.find((p) => p.key === key).path;
 
 // ── Tài nguyên tĩnh ─────────────────────────────────────────────────────────────────────────────
@@ -72,7 +73,7 @@ const footer = (lang, pagePath) => {
     </div>
     <div>
       <p class="foot-h">${esc(c.ui.companyInfo)}</p>
-      <ul class="plain">${navKeys.map((k) => `<li><a href="${urlFor(lang, pathOf(k))}">${esc(c.ui.nav[k])}</a></li>`).join('')}</ul>
+      <ul class="plain">${navKeys.map((k) => `<li><a href="${urlFor(lang, pathOf(k))}">${esc(c.ui.nav[k])}</a></li>`).join('')}<li><a href="${urlFor(lang, pathOf('privacy'))}">${esc(c.ui.nav.privacy)}</a></li></ul>
     </div>
     <div>
       <p class="foot-h">${esc(c.ui.followUs)}</p>
@@ -142,7 +143,7 @@ const gameNode = () => ({
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD', availability: 'https://schema.org/InStock' },
 });
 const faqNode = (items) => ({ '@type': 'FAQPage', mainEntity: items.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) });
-const pageType = { home: 'WebPage', about: 'AboutPage', games: 'CollectionPage', contact: 'ContactPage' };
+const pageType = { home: 'WebPage', about: 'AboutPage', games: 'CollectionPage', contact: 'ContactPage', privacy: 'WebPage' };
 
 const graph = (lang, page, trail) => {
   const c = content[lang], d = c[page.key], url = absUrl(lang, page.path);
@@ -335,7 +336,23 @@ const renderContact = (lang) => {
   return shell({ lang, page, title: d.title, description: d.description, ldGraph: graph(lang, page, trail), body, activeKey: 'contact' });
 };
 
-const renderers = { home: renderHome, about: renderAbout, games: renderGames, contact: renderContact };
+const renderPrivacy = (lang) => {
+  const d = content[lang].privacy;
+  const page = pages.find((entry) => entry.key === 'privacy');
+  const trail = trailFor(lang, 'privacy');
+  const body = `
+<main id="main">
+  <article class="article wrap narrow">
+    ${articleHead(lang, 'privacy', d, trail)}
+    ${d.sections.map(([heading, paragraph]) => `<h2>${esc(heading)}</h2><p>${esc(paragraph)}</p>`).join('\n')}
+    <p><a href="https://policies.google.com/technologies/partner-sites">${esc(d.google)}</a> · <a href="https://myadcenter.google.com/">${esc(d.settings)}</a></p>
+    <p><a href="mailto:${company.email}">${esc(company.email)}</a></p>
+  </article>
+</main>`;
+  return shell({ lang, page, title: d.title, description: d.description, ldGraph: graph(lang, page, trail), body, activeKey: 'privacy' });
+};
+
+const renderers = { home: renderHome, about: renderAbout, games: renderGames, contact: renderContact, privacy: renderPrivacy };
 
 // ── Ghi file ────────────────────────────────────────────────────────────────────────────────────
 const write = (rel, data) => {

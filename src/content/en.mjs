@@ -1,7 +1,7 @@
 // Nội dung tiếng Anh (mặc định). vi.mjs có cùng cấu trúc.
 export default {
   ui: {
-    nav: { home: 'Home', about: 'About', games: 'Games', contact: 'Contact' },
+    nav: { home: 'Home', about: 'About', games: 'Games', contact: 'Contact', privacy: "Privacy policy" },
     skip: 'Skip to content', language: 'Language', breadcrumbs: 'Breadcrumb',
     followUs: 'Follow us', companyInfo: 'Company', legal: 'All rights reserved.',
     taxCode: 'Tax code', address: 'Hai Phong, Vietnam', updated: 'Updated',
@@ -10,6 +10,33 @@ export default {
     notFoundTitle: 'Page not found', notFoundText: 'The page you are looking for does not exist or has moved.', backHome: 'Back to the homepage',
     facts: { legalName: 'Legal name', taxCode: 'Tax code (TIN)', duns: 'D-U-N-S number', founded: 'Founded', location: 'Location', founders: 'Founders', email: 'Email', phone: 'Phone' },
     foundersValue: 'Nguyen Thanh Duy (Founder), Sandy (Co-Founder)',
+  },
+
+  privacy: {
+    "h1": "Privacy policy",
+    "lead": "This policy covers the public Thanh Danh Soft and Rain Of Fire websites. It describes data use on these websites.",
+    "sections": [
+      [
+        "Website data",
+        "When you visit, hosting and security services may process your IP address, browser information, request URL and time to deliver and protect the website. If you email us, we use the information you send to respond."
+      ],
+      [
+        "Analytics",
+        "Rain Of Fire uses Google Analytics to measure page visits and clicks to Google Play and the App Store. Google Analytics may process device or browser information, IP addresses, cookies and other identifiers to produce usage reports."
+      ],
+      [
+        "Advertising cookies",
+        "On pages where Google ads are enabled, Google and other ad vendors may place or read cookies or use web beacons, IP addresses and other identifiers to serve or measure ads. Where provided, you can control your choices through the consent dialog. You can also manage cookies in your browser and use Google’s ad settings."
+      ],
+      [
+        "Contact",
+        "Contact Thanh Danh Soft with questions or requests about your website data."
+      ]
+    ],
+    "google": "How Google uses data from partner sites",
+    "settings": "Google ad settings",
+    "title": "Privacy policy | Thanh Danh Soft",
+    "description": "Read how Thanh Danh Soft and Rain Of Fire websites use analytics, advertising cookies and website data."
   },
 
   home: {

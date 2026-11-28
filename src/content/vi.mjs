@@ -1,7 +1,7 @@
 // Nội dung tiếng Việt, cùng cấu trúc với en.mjs.
 export default {
   ui: {
-    nav: { home: 'Trang chủ', about: 'Giới thiệu', games: 'Game', contact: 'Liên hệ' },
+    nav: { home: 'Trang chủ', about: 'Giới thiệu', games: 'Game', contact: 'Liên hệ', privacy: "Chính sách riêng tư" },
     skip: 'Chuyển đến nội dung', language: 'Ngôn ngữ', breadcrumbs: 'Đường dẫn',
     followUs: 'Theo dõi chúng tôi', companyInfo: 'Công ty', legal: 'Bảo lưu mọi quyền.',
     taxCode: 'Mã số thuế', address: 'Hải Phòng, Việt Nam', updated: 'Cập nhật',
@@ -10,6 +10,33 @@ export default {
     notFoundTitle: 'Không tìm thấy trang', notFoundText: 'Trang bạn tìm không tồn tại hoặc đã được chuyển đi.', backHome: 'Về trang chủ',
     facts: { legalName: 'Tên pháp lý', taxCode: 'Mã số thuế', duns: 'Mã D-U-N-S', founded: 'Thành lập', location: 'Địa điểm', founders: 'Người sáng lập', email: 'Email', phone: 'Điện thoại' },
     foundersValue: 'Nguyễn Thanh Duy (Founder), Sandy (Co-Founder)',
+  },
+
+  privacy: {
+    "h1": "Chính sách riêng tư",
+    "lead": "Chính sách này giải thích cách xử lý dữ liệu trên các website công khai của Thanh Danh Soft và Rain Of Fire.",
+    "sections": [
+      [
+        "Dữ liệu website",
+        "Khi bạn truy cập, dịch vụ lưu trữ và bảo mật có thể xử lý địa chỉ IP, thông tin trình duyệt, URL và thời điểm yêu cầu để vận hành và bảo vệ website. Khi bạn gửi email, chúng tôi dùng thông tin bạn gửi để phản hồi."
+      ],
+      [
+        "Đo lường",
+        "Website Rain Of Fire dùng Google Analytics để đo lượt xem và lượt nhấp sang Google Play hoặc App Store. Google Analytics có thể xử lý thông tin thiết bị hoặc trình duyệt, địa chỉ IP, cookie và mã định danh để tạo báo cáo sử dụng."
+      ],
+      [
+        "Cookie quảng cáo",
+        "Trên các trang có bật quảng cáo Google, Google và các nhà cung cấp quảng cáo khác có thể đọc hoặc đặt cookie, hoặc dùng web beacon, địa chỉ IP và mã định danh khác để phân phối hoặc đo lường quảng cáo. Bạn có thể chọn tùy chọn trong hộp thoại đồng ý khi được hiển thị, quản lý cookie trong trình duyệt hoặc dùng cài đặt quảng cáo của Google."
+      ],
+      [
+        "Liên hệ",
+        "Liên hệ Thanh Danh Soft nếu bạn có câu hỏi hoặc yêu cầu liên quan đến dữ liệu của mình trên website."
+      ]
+    ],
+    "google": "Cách Google dùng dữ liệu từ website đối tác",
+    "settings": "Cài đặt quảng cáo Google",
+    "title": "Chính sách riêng tư | Thanh Danh Soft",
+    "description": "Tìm hiểu cách website Thanh Danh Soft và Rain Of Fire xử lý dữ liệu truy cập, Google Analytics và cookie quảng cáo."
   },
 
   home: {
